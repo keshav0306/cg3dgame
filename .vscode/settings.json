@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "vector": "cpp",
+        "complex": "cpp",
+        "importer.hpp": "c",
+        "iosfwd": "c",
+        "iterator": "c",
+        "scene.h": "c",
+        "postprocess.h": "c",
+        "stb_image.h": "c"
+    }
+}
