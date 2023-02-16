@@ -7,6 +7,8 @@
         "iterator": "c",
         "scene.h": "c",
         "postprocess.h": "c",
-        "stb_image.h": "c"
+        "stb_image.h": "c",
+        "ostream": "cpp",
+        "iostream": "cpp"
     }
 }

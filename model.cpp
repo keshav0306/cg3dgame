@@ -54,6 +54,28 @@ Mesh Model::makeMesh(aiMesh * mesh, const aiScene * scene){
         vector.x = mesh->mVertices[i].x;
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
+        
+        if(vector.x > this->max_x){
+            this->max_x = vector.x;
+        }
+        if(vector.y > this->max_y){
+            this->max_y = vector.y;
+        }
+        if(vector.z > this->max_z){
+            this->max_z = vector.z;
+        }
+
+        if(vector.x < this->min_x){
+            this->min_x = vector.x;
+        }
+        if(vector.y < this->min_y){
+            this->min_y = vector.y;
+        }
+        if(vector.z < this->min_z){
+            this->min_z = vector.z;
+        }
+
+        
         // cout << "Vertices : " << vector.x << " " << vector.y << " " << vector.z << endl;
         vertex.Position = vector;
         

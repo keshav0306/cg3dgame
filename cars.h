@@ -22,6 +22,7 @@ class OpponentCar : public Car{
     float dir_off;
     float curr_following_dist;
     float curr_angle;
+    float last_angle;
 };
 
 class QueenCar : public Car{

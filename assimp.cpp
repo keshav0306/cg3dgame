@@ -17,13 +17,8 @@ using namespace std;
 
 int window_height;
 int window_width;
-int prog_id;
 
-float player_x;
-float player_z;
-float player_angle;
 float val = 0.0f;
-float dir_off;
 float velocity = 0.0f;
 float retardation = 0.1f;
 
@@ -106,31 +101,38 @@ int main(){
     }
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glViewport(0, 0, window_width * 2, window_height * 2);
+
     cout << "hi\n";
     Shader shader("mesh.vs", "mesh.fs");
     prog_id = shader.prog_id;
-    Model m("/Users/keshavgupta/desktop/CarRace/stadium.glb", shader);
-    Model m2("/Users/keshavgupta/desktop/CarRace/mcqueen/scene.gltf", shader);
-    GLfloat modelt[] = {-1.0f, 0.0f, 0.0f, 0.0f,
-                                0.0f, 0.0f, 1.0f, 0.0f,
-                                0.0f, 1.0f, 0.0f, 0.0f,
-                                0.0f, 0.0f, 0.0f, 1.0f};
+    Model stadium("/Users/keshavgupta/desktop/CarRace/stadium.glb", shader);
+    Model car("/Users/keshavgupta/desktop/CarRace/mcqueen/scene.gltf", shader);
 
-    OpponentCar opcar(&m2, modelt, 4.0f, 10.0f, -40.0f);
+    // GLfloat modelt[] = {1.0f, 0.0f, 0.0f, 0.0f,
+    //                             0.0f, 0.0f, 1.0f, 0.0f,
+    //                             0.0f, -1.0f, 0.0f, 0.0f,
+    //                             0.0f, 0.0f, 0.0f, 1.0f};
 
-    qcar.init(&m2, modelt, 5.0f, -40.0f, 10.0f);
-    
-    player_x = 5.0f;
-    player_z = 0.0f;
-    dir_off = 0.0f;
-    player_angle = 0.0f;
+    GLfloat modelt[] = {1.0f, 0.0f, 0.0f, 0.0f,
+                            0.0f, 1.0, 0.0f, 0.0f,
+                            0.0f, 0.0f, 1.0f, 0.0f,
+                            0.0f, 0.0f, 0.0f, 1.0f};
+
+    OpponentCar opcar(&m2, modelt, 40.0f, 50.0f, -40.0f);
+    OpponentCar opcar2(&m2, modelt, 40.0f, 80.0f, -40.0f);
+    OpponentCar opcar3(&m2, modelt, 40.0f, 70.0f, -40.0f);
+
+    cout << "minmax : " << m2.max_x << " " << m2.min_x << endl;
+    cout << "minmax : " << m2.max_y << " " << m2.min_y << endl;
+    cout << "minmax : " << m2.max_z << " " << m2.min_z << endl;
+
+    qcar.init(&m2, modelt, 45.0f, -40.0f, 0.0f);
+
 
     while(!glfwWindowShouldClose(window)){
         glViewport(0, 0, window_width * 2, window_height * 2);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // shader.use();
 
         if(velocity > 0){
             qcar.dir_off += velocity;
@@ -141,14 +143,9 @@ int main(){
             velocity = 0.0f;
         }
 
-        GLfloat model2[] = {-1.0f, 0.0f, 0.0f, 0.0f,
+        GLfloat model2[] = {1.0f, 0.0f, 0.0f, 0.0f,
                                 0.0f, 0.0f, 1.0f, 0.0f,
-                                0.0f, 1.0f, 0.0f, 0.0f,
-                                0.0f, 0.0f, 0.0f, 1.0f};
-
-        GLfloat transform2[] = {cos(player_angle), 0.0f, -sin(player_angle), player_x - dir_off * sin(player_angle),
-                                0.0f, 1.0f, 0.0f, -40.0f,
-                                sin(player_angle), 0.0f, cos(player_angle), player_z + dir_off * cos(player_angle),
+                                0.0f, -1.0f, 0.0f, 0.0f,
                                 0.0f, 0.0f, 0.0f, 1.0f};
 
         GLfloat model[] = {50.0f, 0.0f, 0.0f, 0.0f,
@@ -160,7 +157,6 @@ int main(){
                                 0.0f, 1.0f, 0.0f, 0.0f,
                                 0.0f, 0.0f, 1.0f, 0.0f,
                                 0.0f, 0.0f, 0.0f, 1.0f};
-
 
         float cam_x = qcar.x - (qcar.dir_off - 8.0) * sin(qcar.player_angle);
         float cam_z = qcar.z + (qcar.dir_off - 8.0) * cos(qcar.player_angle);
@@ -176,11 +172,15 @@ int main(){
                             0.0f, 0.0f, 1.0f, 0.0f,
                             0.0f, 0.0f, 1.0f, 0.0f};
 
-        m.Display(model, transform, view, projection);
-        // m2.Display(model2, transform3, view);
-        // m2.Display(model2, transform2, view, projection);
+        stadium.Display(model, transform, view, projection);
+
         qcar.Display(view, projection);
         opcar.Display(view, projection);
+        opcar2.Display(view, projection);
+        opcar3.Display(view, projection);
+
+
+
 
         glViewport(0, 0, 300, 300);
 
@@ -193,12 +193,12 @@ int main(){
                             0.0f, 0.0f, 1.0f, 0.0f,
                             0.0f, 0.0f, 1.0f, 0.0f};
 
-        GLfloat view2[] = {cos(qcar.player_angle), -sin(qcar.player_angle), 0.0f, -cam_x * cos(qcar.player_angle) - cam_y * (-sin(qcar.player_angle)),
-                        sin(qcar.player_angle), cos(qcar.player_angle), 0.0f, -sin(qcar.player_angle) * cam_x - cam_y * cos(qcar.player_angle),
+        GLfloat view2[] = {sin(qcar.player_angle), cos(qcar.player_angle), 0.0f, -cam_x * cos(qcar.player_angle) - cam_y * (-sin(qcar.player_angle)),
+                        -cos(qcar.player_angle), sin(qcar.player_angle), 0.0f, -sin(qcar.player_angle) * cam_x - cam_y * cos(qcar.player_angle),
                         0.0f, -1.0f, 0.0f, cam_y,
                         0.0f, 0.0f, 0.0f, 1.0f};
 
-        m.Display(model, transform, view2, projection2);
+        stadium.Display(model, transform, view2, projection2);
         qcar.Display(view2, projection2);
         glfwSwapBuffers(window);
         glfwPollEvents();
