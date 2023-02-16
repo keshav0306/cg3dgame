@@ -24,5 +24,5 @@ class Mesh{
 
     void makeTheBuffs();
 
-    void display(GLfloat *model, GLfloat * transform, GLfloat * view);
+    void display(GLfloat *model, GLfloat * transform, GLfloat * view, GLfloat * projection);
 };

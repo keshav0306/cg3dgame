@@ -23,4 +23,5 @@ void main(){
     else{
         FragColor = vec4(1.0) * texture(tex, texxy);
     }
+    // FragColor = vec4(1.0f);
 }

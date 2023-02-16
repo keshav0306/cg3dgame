@@ -139,8 +139,8 @@ vector<Texture> Model::loadTextures(const aiScene * scene, aiMaterial * mat, aiT
         // for other files
 
         string filename = directory + '/' + string(str.C_Str());
+        stbi_set_flip_vertically_on_load(true);
         unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-
         unsigned int textureID;
         glGenTextures(1, &textureID);
         if(data){
@@ -182,8 +182,9 @@ vector<Texture> Model::loadTextures(const aiScene * scene, aiMaterial * mat, aiT
     return textures;
 }
 
-void Model::Display(GLfloat *model, GLfloat * transform, GLfloat * view){
+void Model::Display(GLfloat *model, GLfloat * transform, GLfloat * view, GLfloat * projection){
+    // cout << model[0] << endl;
     for(int i=0;i<meshes.size();i++){
-        meshes[i].display(model, transform, view);
+        meshes[i].display(model, transform, view, projection);
     }
 }

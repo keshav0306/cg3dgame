@@ -14,14 +14,16 @@ class Model{
 
     Shader shader;
 
+    Model(){
+        ;
+    }
     Model(char * path, Shader shader);
 
     void climbTheTree(aiNode * node, const aiScene * scene);
 
-
     Mesh makeMesh(aiMesh * mesh, const aiScene * scene);
     
     vector<Texture> loadTextures(const aiScene * scene, aiMaterial * mat, aiTextureType type, string typeName);
-    void Display(GLfloat *model, GLfloat * transform, GLfloat * view);
+    void Display(GLfloat *model, GLfloat * transform, GLfloat * view, GLfloat * projection);
     
 };

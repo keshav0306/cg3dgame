@@ -52,11 +52,15 @@ void Mesh::makeTheBuffs(){
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(unsigned int), &this->indices[0], GL_STATIC_DRAW);
 }
 
-void Mesh::display(GLfloat *model, GLfloat * transform, GLfloat * view){
+void Mesh::display(GLfloat *model, GLfloat * transform, GLfloat * view, GLfloat * projection){
     glBindVertexArray(this->VAO);
+    this->shader.use();
+    // cout << this->shader.prog_id << endl;
+    // cout << this->shader.prog_id << endl;
     int comp_loc = glGetUniformLocation(this->shader.prog_id, "comp");
     for(int i=0;i<textures.size();i++){
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        // cout << "yo\n";
         glUniform1i(comp_loc, textures[i].nrComponents);
     }
 
@@ -67,10 +71,12 @@ void Mesh::display(GLfloat *model, GLfloat * transform, GLfloat * view){
     int m_loc = glGetUniformLocation(this->shader.prog_id, "model");
     int t_loc = glGetUniformLocation(this->shader.prog_id, "transform");
     int v_loc = glGetUniformLocation(this->shader.prog_id, "view");
+    int p_loc = glGetUniformLocation(this->shader.prog_id, "projection");
 
     glUniformMatrix4fv(m_loc, 1, GL_TRUE, model);
     glUniformMatrix4fv(t_loc, 1, GL_TRUE, transform);
     glUniformMatrix4fv(v_loc, 1, GL_TRUE, view);
-
+    glUniformMatrix4fv(p_loc, 1, GL_TRUE, projection);
+    // cout << indices.size() << endl;
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
