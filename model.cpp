@@ -1,16 +1,18 @@
 #include <iostream>
 #include <vector>
-#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <tuple>
 #include <glm/glm.hpp>
 #include <string>
 #include <assimp/postprocess.h>
 
 using namespace std;
+#include "bs.h"
 #include "shader.h"
 #include "mesh.h"
 #include "model.h"
@@ -54,7 +56,7 @@ Mesh Model::makeMesh(aiMesh * mesh, const aiScene * scene){
         vector.x = mesh->mVertices[i].x;
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
-        
+
         if(vector.x > this->max_x){
             this->max_x = vector.x;
         }
@@ -121,16 +123,16 @@ Mesh Model::makeMesh(aiMesh * mesh, const aiScene * scene){
 
     // Now time for the textures
     aiMaterial * mat = scene->mMaterials[mesh->mMaterialIndex];
+
     vector<Texture> diffuseMaps = loadTextures(scene, mat, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     vector<Texture> specMaps = loadTextures(scene, mat, aiTextureType_SPECULAR, "texture_specular");
-    // cout << specMaps.size() << endl;
     textures.insert(textures.end(), specMaps.begin(), specMaps.end());
-    vector<Texture> normalMaps = loadTextures(scene, mat, aiTextureType_HEIGHT, "texture_height");
-    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-    vector<Texture> ambientMaps = loadTextures(scene, mat, aiTextureType_AMBIENT, "texture_ambient");
-    textures.insert(textures.end(), ambientMaps.begin(), ambientMaps.end());
-    cout << "size of textures : " << textures.size() << endl;
+    // vector<Texture> normalMaps = loadTextures(scene, mat, aiTextureType_HEIGHT, "texture_height");
+    // textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+    // vector<Texture> ambientMaps = loadTextures(scene, mat, aiTextureType_AMBIENT, "texture_ambient");
+    // textures.insert(textures.end(), ambientMaps.begin(), ambientMaps.end());
+    // cout << "size of textures : " << textures.size() << endl;
     return Mesh(vertices, indices, textures, shader);
 }
     
@@ -161,7 +163,19 @@ vector<Texture> Model::loadTextures(const aiScene * scene, aiMaterial * mat, aiT
         // for other files
 
         string filename = directory + '/' + string(str.C_Str());
-        stbi_set_flip_vertically_on_load(true);
+        cout << filename << endl;
+        bool skip = false;
+        cout << textures_loaded.size() << endl;
+        for(unsigned int j = 0; j < textures_loaded.size(); j++)
+        {
+                if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
+                {
+                    textures.push_back(textures_loaded[j]);
+                    skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
+                    break;
+                }
+        }
+        if(!skip){
         unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
         unsigned int textureID;
         glGenTextures(1, &textureID);
@@ -190,6 +204,7 @@ vector<Texture> Model::loadTextures(const aiScene * scene, aiMaterial * mat, aiT
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
             stbi_image_free(data);
         }
         else{
@@ -199,7 +214,10 @@ vector<Texture> Model::loadTextures(const aiScene * scene, aiMaterial * mat, aiT
         texture.id = textureID;
         // cout << textureID << endl;
         texture.type = typeName;
+        texture.path = str.C_Str();
         textures.push_back(texture);
+        textures_loaded.push_back(texture); 
+        }
     }
     return textures;
 }

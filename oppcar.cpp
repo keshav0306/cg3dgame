@@ -8,15 +8,19 @@
 #include <vector>
 #include <stdlib.h>
 #include <glm/glm.hpp>
+#include <tuple>
 
 using namespace std;
+#include "bs.h"
 #include "shader.h"
 #include "mesh.h"
 #include "model.h"
 #include "cars.h"
 
-OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float outer_radius, float y){
+extern vector<float> mult4v4(float * m, vector <float> v);
 
+OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float outer_radius, float y){
+    cout << "outer radius" << outer_radius << endl;
     this->m = m;
     this->model = model;
     this->inner_radius = inner_radius;
@@ -31,6 +35,7 @@ OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float out
     this->curr_following_dist = sqrt((cx - x) * (cx - x) + (cz - z) * (cz - z));
     cout << x << " " << z << endl;
     this->last_angle = 0.0f;
+    bs.init(5, m->max_x, m->min_z, m->max_z, 0, 0);
 }
 
 void OpponentCar::Display(float * view, float * projection){
@@ -65,7 +70,7 @@ void OpponentCar::Display(float * view, float * projection){
     // cout << " angle : " << angle << endl;
     // cout << " ----- \n";
 
-    float change_angle = (angle - last_angle) *dir_off / curr_following_dist + last_angle;
+    float change_angle = (angle - this->last_angle) *dir_off / curr_following_dist + last_angle;
     GLfloat transform[] = {cos(change_angle), 0.0f, -sin(change_angle), this->x - dir_off * sin(angle) * mult,
                             0.0f, 1.0f, 0.0f, this->y,
                             sin(change_angle), 0.0f, cos(change_angle), this->z + dir_off * cos(angle) * mult,
@@ -85,7 +90,49 @@ void OpponentCar::Display(float * view, float * projection){
         this->dir_off = -0.05f;
         this->curr_following_dist = sqrt((cx - this->x) * (cx - this->x) + (cz - this->z) * (cz - this->z));
     }
-    dir_off +=0.10f;
+    // dir_off +=0.10f;
     this->m->Display(this->model, transform, view, projection);
     
+}
+
+vector<vector<float>> OpponentCar::get_the_bs(){
+    float angle = atan((-this->curr_following_x + this->x) / (this->curr_following_z - this->z));
+
+    int mult = 1;
+    float dx = this->x - this->curr_following_x;
+    float dz = this->curr_following_z - this->z;
+
+    if(dx > 0 && dz > 0){
+        mult = 1;
+    }
+    else if(dx > 0 && dz < 0){
+        mult = -1;
+    }
+    else if(dx < 0 && dz > 0){
+        mult = 1;
+    }
+    else{
+        mult = -1;
+    }
+    float change_angle = (angle - this->last_angle) *dir_off / curr_following_dist + last_angle;
+    GLfloat transform[] = {cos(change_angle), 0.0f, -sin(change_angle), this->x - dir_off * sin(angle) * mult,
+                            0.0f, 1.0f, 0.0f, this->y,
+                            sin(change_angle), 0.0f, cos(change_angle), this->z + dir_off * cos(angle) * mult,
+                            0.0f, 0.0f, 0.0f, 1.0f};
+
+    // cout << "-------------------\n";
+    vector <vector<float> > ret;
+    for(int i=0;i<this->bs.n;i++){
+        vector<float> v;
+        v.push_back(get<0>(this->bs.sphere_centers[i]));
+        v.push_back(get<1>(this->bs.sphere_centers[i]));
+        v.push_back(get<2>(this->bs.sphere_centers[i]));
+        v.push_back(1.0f);
+        vector <float> out = mult4v4(this->model, v);
+        vector <float> out2 = mult4v4(transform, out);
+        ret.push_back(out2);
+        // cout << out[0] << " " << out[1] << " " << out[2] << " " << out[3] << endl;
+    }
+    // cout << "-------------------\n";
+    return ret;
 }

@@ -13,7 +13,8 @@ class Model{
     string directory; 
 
     Shader shader;
-
+    vector<Texture> textures_loaded;
+    
     float max_x = -INT_MAX, min_x = INT_MAX;
     float max_y = -INT_MAX, min_y = INT_MAX;
     float max_z = -INT_MAX, min_z = INT_MAX;

@@ -10,10 +10,10 @@ in vec2 texxy;
 void main(){
     if(comp == 0){
         vec3 an = normalize(norm);
-        vec3 al = normalize(position - vec3(0.0f, sin(val), 0.0f));
+        vec3 al = normalize(position - vec3(0.0f, 0.0f, 0.0f));
         float diff = dot(an, al);
         if(diff > 0){
-        FragColor = vec4(1.0) * diff;
+        FragColor = vec4(1.0, 0.5, 0.0, 1.0) * diff;
         }
         else{
         FragColor = vec4(1.0) * diff;

@@ -40,12 +40,12 @@ void Mesh::makeTheBuffs(){
     // tex coords
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, TexCoords));
     glEnableVertexAttribArray(2);
-    // tangent
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Tangent));
-    glEnableVertexAttribArray(3);
-    // bitangent
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Bitangent));
-    glEnableVertexAttribArray(4);
+    // // tangent
+    // glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Tangent));
+    // glEnableVertexAttribArray(3);
+    // // bitangent
+    // glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, Bitangent));
+    // glEnableVertexAttribArray(4);
 
     // file the EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
@@ -59,6 +59,8 @@ void Mesh::display(GLfloat *model, GLfloat * transform, GLfloat * view, GLfloat 
     // cout << this->shader.prog_id << endl;
     int comp_loc = glGetUniformLocation(this->shader.prog_id, "comp");
     for(int i=0;i<textures.size();i++){
+        glActiveTexture(GL_TEXTURE0 + i);
+        glUniform1i(glGetUniformLocation(this->shader.prog_id, "tex"), i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
         // cout << "yo\n";
         glUniform1i(comp_loc, textures[i].nrComponents);

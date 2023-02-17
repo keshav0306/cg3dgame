@@ -8,6 +8,7 @@ struct Vertex{
 
 struct Texture{
     string type;
+    string path;
     unsigned int id;
     int nrComponents;
 };
