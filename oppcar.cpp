@@ -19,7 +19,7 @@ using namespace std;
 
 extern vector<float> mult4v4(float * m, vector <float> v);
 
-OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float outer_radius, float y){
+OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float outer_radius, float y, float scale){
     cout << "outer radius" << outer_radius << endl;
     this->m = m;
     this->model = model;
@@ -35,7 +35,8 @@ OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float out
     this->curr_following_dist = sqrt((cx - x) * (cx - x) + (cz - z) * (cz - z));
     cout << x << " " << z << endl;
     this->last_angle = 0.0f;
-    bs.init(5, m->max_x, m->min_z, m->max_z, 0, 0);
+    bs.init(5, m->max_x * scale, m->min_y * scale, m->max_y * scale, 0, 0);
+
 }
 
 void OpponentCar::Display(float * view, float * projection){
@@ -91,6 +92,7 @@ void OpponentCar::Display(float * view, float * projection){
         this->curr_following_dist = sqrt((cx - this->x) * (cx - this->x) + (cz - this->z) * (cz - this->z));
     }
     // dir_off +=0.10f;
+    // cout << "display func : " << this->dir_off << endl;
     this->m->Display(this->model, transform, view, projection);
     
 }
@@ -119,7 +121,7 @@ vector<vector<float>> OpponentCar::get_the_bs(){
                             0.0f, 1.0f, 0.0f, this->y,
                             sin(change_angle), 0.0f, cos(change_angle), this->z + dir_off * cos(angle) * mult,
                             0.0f, 0.0f, 0.0f, 1.0f};
-
+    // cout <<  "dir_off is : " <<  this->dir_off << endl;
     // cout << "-------------------\n";
     vector <vector<float> > ret;
     for(int i=0;i<this->bs.n;i++){
@@ -128,10 +130,12 @@ vector<vector<float>> OpponentCar::get_the_bs(){
         v.push_back(get<1>(this->bs.sphere_centers[i]));
         v.push_back(get<2>(this->bs.sphere_centers[i]));
         v.push_back(1.0f);
-        vector <float> out = mult4v4(this->model, v);
-        vector <float> out2 = mult4v4(transform, out);
+        // vector <float> out = mult4v4(this->model, v);
+        vector <float> out2 = mult4v4(transform, v);
         ret.push_back(out2);
+        // cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
         // cout << out[0] << " " << out[1] << " " << out[2] << " " << out[3] << endl;
+        // cout << out2[0] << " " << out2[1] << " " << out2[2] << " " << out2[3] << endl;
     }
     // cout << "-------------------\n";
     return ret;

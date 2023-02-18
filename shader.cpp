@@ -18,6 +18,7 @@ void Shader::makeProgram(char * vsPath, char * fsPath){
         std::cout << "VS OR FS FAILED TO COMPILE\n";
     }
     this->prog_id = glCreateProgram();
+    cout << "hi\n";
     glAttachShader(this->prog_id, this->vs_id);
     glAttachShader(this->prog_id, this->fs_id);
     glLinkProgram(this->prog_id);
@@ -32,6 +33,7 @@ void Shader::makeProgram(char * vsPath, char * fsPath){
 }
 
 Shader::Shader(char * vsPath, char * fsPath){
+    cout << "hi\n";
     makeProgram(vsPath, fsPath);
 }
 
@@ -57,6 +59,7 @@ void Shader::attatchVs(char * vsPath){
     char * mem =  (char * )calloc(1024, sizeof(char));
     read(fd, mem, 1024);
     this->vs_id = glCreateShader(GL_VERTEX_SHADER);
+    cout << "attan\n";
     const char * c = mem;
     glShaderSource(this->vs_id, 1, &c, NULL);
     glCompileShader(this->vs_id);

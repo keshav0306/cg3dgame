@@ -18,8 +18,13 @@ using namespace std;
 #include "model.h"
 
 Model::Model(char * path, Shader shader){
+    this->init(path, shader);
+}
+
+void Model::init(char * path, Shader shader){
+    cout <<"yo\n";
     Assimp::Importer import;
-    const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs );
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
         cout << "ERROR::ASSIMP::" << import.GetErrorString() << endl;
     }
@@ -28,7 +33,6 @@ Model::Model(char * path, Shader shader){
     this->shader = shader;
     climbTheTree(scene->mRootNode, scene);
 }
-
 
 void Model::climbTheTree(aiNode * node, const aiScene * scene){
     for(int i=0;i<node->mNumMeshes;i++){
@@ -56,6 +60,7 @@ Mesh Model::makeMesh(aiMesh * mesh, const aiScene * scene){
         vector.x = mesh->mVertices[i].x;
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
+        // cout << vector.x << " " << vector.y << " " << vector.z << endl;
 
         if(vector.x > this->max_x){
             this->max_x = vector.x;
@@ -93,19 +98,9 @@ Mesh Model::makeMesh(aiMesh * mesh, const aiScene * scene){
             vec.x = mesh->mTextureCoords[0][i].x;
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.TexCoords = vec;
-            
-            // vector.x = mesh->mTangents[i].x;
-            // vector.y = mesh->mTangents[i].y;
-            // vector.z = mesh->mTangents[i].z;
-            // vertex.Tangent = vector;
-            
-            // vector.x = mesh->mBitangents[i].x;
-            // vector.y = mesh->mBitangents[i].y;
-            // vector.z = mesh->mBitangents[i].z;
-            // vertex.Bitangent = vector;
         }
         else{
-            cout << "no tex coords for this mesh\n";
+            // cout << "no tex coords for this mesh\n";
             vertex.TexCoords = glm::vec2(0.5f, 0.5f);
         }
         vertices.push_back(vertex);

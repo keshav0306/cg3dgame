@@ -12,6 +12,8 @@ using namespace std;
 #include "shader.h"
 #include "mesh.h"
 
+float val = 0;
+
 Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> texture, Shader shader){
     this->vertices = vertices;
     this->indices = indices;
@@ -58,12 +60,15 @@ void Mesh::display(GLfloat *model, GLfloat * transform, GLfloat * view, GLfloat 
     // cout << this->shader.prog_id << endl;
     // cout << this->shader.prog_id << endl;
     int comp_loc = glGetUniformLocation(this->shader.prog_id, "comp");
+    int val_loc = glGetUniformLocation(this->shader.prog_id, "val");
+    glUniform1f(val_loc, val++);
+
     for(int i=0;i<textures.size();i++){
         glActiveTexture(GL_TEXTURE0 + i);
         glUniform1i(glGetUniformLocation(this->shader.prog_id, "tex"), i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
-        // cout << "yo\n";
         glUniform1i(comp_loc, textures[i].nrComponents);
+        // cout << "yo\n";
     }
 
     if(textures.size() == 0){

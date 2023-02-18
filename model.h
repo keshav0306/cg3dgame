@@ -22,7 +22,9 @@ class Model{
     Model(){
         ;
     }
+
     Model(char * path, Shader shader);
+    void init(char * path ,Shader shader);
 
     void climbTheTree(aiNode * node, const aiScene * scene);
 

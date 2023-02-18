@@ -10,8 +10,8 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 void main(){
-vec4 pos = projection * view * transform * model * vec4(pos.x, pos.y, pos.z, 1.0f);
-gl_Position = vec4(pos.xyzw);
+vec4 posit = projection * view * transform * model * vec4(pos.x, pos.y, pos.z, 1.0f);
+gl_Position = vec4(posit.xyzw);
 position = (transform * model * vec4(pos.x, pos.y, pos.z, 1.0f)).xyz;
 norm = normal;
 texxy = texcoords;

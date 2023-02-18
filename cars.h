@@ -14,7 +14,7 @@ class Car{
 
 class OpponentCar : public Car{
     public:
-    OpponentCar(Model * m, float * model, float x, float y, float z);
+    OpponentCar(Model * m, float * model, float x, float y, float z, float scale);
     void Display(float * view, float * projection);
     vector<vector <float> > get_the_bs();
     float curr_following_x;
@@ -29,11 +29,11 @@ class OpponentCar : public Car{
 
 class QueenCar : public Car{
     public:
-    QueenCar(Model * m, float * model, float x, float y, float z);
+    QueenCar(Model * m, float * model, float x, float y, float z, float scale);
     QueenCar(){
         ;
     };
-    void init(Model * m, float * model, float x, float y, float z);
+    void init(Model * m, float * model, float x, float y, float z, float scale);
     void Display(float * view, float * projection);
     vector<vector <float> > get_the_bs();
     float player_angle;

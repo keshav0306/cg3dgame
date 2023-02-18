@@ -1,0 +1,11 @@
+Model Information:
+* title:	Trapped (animated)
+* source:	https://sketchfab.com/3d-models/trapped-animated-26009ae82e8c4211978de4e4d892f5e7
+* author:	ConradJustin (https://sketchfab.com/ConradJustin)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Trapped (animated)" (https://sketchfab.com/3d-models/trapped-animated-26009ae82e8c4211978de4e4d892f5e7) by ConradJustin (https://sketchfab.com/ConradJustin) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

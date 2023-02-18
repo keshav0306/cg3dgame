@@ -29,8 +29,8 @@ vector<float> mult4v4(float * m, vector <float> v){
     return v2;
 }
 
-QueenCar::QueenCar(Model * m, float * model, float x, float y, float z){
-    init(m, model, x, y, z);
+QueenCar::QueenCar(Model * m, float * model, float x, float y, float z, float scale){
+    init(m, model, x, y, z, scale);
 }
 
 void QueenCar::Display(float * view, float * projection){
@@ -44,7 +44,7 @@ void QueenCar::Display(float * view, float * projection){
 
 }
 
-void QueenCar::init(Model * m, float * model, float x, float y, float z){
+void QueenCar::init(Model * m, float * model, float x, float y, float z, float scale){
     this->m = m;
     this->model = (float *)malloc(sizeof(float) * 16);
     memcpy(this->model, model, 16 * sizeof(float));
@@ -53,7 +53,7 @@ void QueenCar::init(Model * m, float * model, float x, float y, float z){
     this->z = this->base_z = z;
     this->dir_off = 0.0f;
     this->player_angle = 0.0f;
-    bs.init(5, m->max_x, m->min_z, m->max_z, 0, 0);
+    bs.init(5, m->max_x * scale, m->min_y * scale, m->max_y * scale, 0, 0);
 }
 
 vector<vector<float> > QueenCar::get_the_bs(){
@@ -70,8 +70,8 @@ vector<vector<float> > QueenCar::get_the_bs(){
         v.push_back(get<1>(this->bs.sphere_centers[i]));
         v.push_back(get<2>(this->bs.sphere_centers[i]));
         v.push_back(1.0f);
-        vector <float> out = mult4v4(this->model, v);
-        vector <float> out2 = mult4v4(transform, out);
+        // vector <float> out = mult4v4(this->model, v);
+        vector <float> out2 = mult4v4(transform, v);
         ret.push_back(out2);
         // cout << out[0] << " " << out[1] << " " << out[2] << " " << out[3] << endl;
     }
