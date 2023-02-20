@@ -19,27 +19,31 @@ using namespace std;
 
 extern vector<float> mult4v4(float * m, vector <float> v);
 
-OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float outer_radius, float y, float scale){
-    cout << "outer radius" << outer_radius << endl;
+OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float outer_radius, float y, float scale, int index){
+    // cout << "outer radius" << outer_radius << endl;
     this->m = m;
     this->model = model;
     this->inner_radius = inner_radius;
     this->outer_radius = outer_radius;
-    float x = this->x = (inner_radius + outer_radius )/ 2;
-    float z = this->z = 0.0f;
+    float x = this->base_x = this->x = (inner_radius + outer_radius )/ 2;
+    float z = this->base_z = this->z = 0.0f;
     this->y = y;
+    // cout << "oppcar init : " << this->x << " " << this->y << " " << this->z << endl;
     float dist = (float) rand() / (float) (RAND_MAX / (outer_radius - inner_radius)) + inner_radius;
     this->curr_angle = 20 * M_PI / 180;
     float cx = this->curr_following_x = dist * cos(this->curr_angle);
     float cz = this->curr_following_z = dist * sin(this->curr_angle);
     this->curr_following_dist = sqrt((cx - x) * (cx - x) + (cz - z) * (cz - z));
     cout << x << " " << z << endl;
+    this->dir_off = 0.0f;
     this->last_angle = 0.0f;
+    this->index = index;
     bs.init(5, m->max_x * scale, m->min_y * scale, m->max_y * scale, 0, 0);
 
 }
 
 void OpponentCar::Display(float * view, float * projection){
+    // cout << " before x and z : " << this->x << " " << this->z << endl;
 
     float angle = atan((-this->curr_following_x + this->x) / (this->curr_following_z - this->z));
 
@@ -77,10 +81,14 @@ void OpponentCar::Display(float * view, float * projection){
                             sin(change_angle), 0.0f, cos(change_angle), this->z + dir_off * cos(angle) * mult,
                             0.0f, 0.0f, 0.0f, 1.0f};
 
+    this->base_x = this->x - dir_off * sin(angle) * mult;
+    this->base_z = this->z + dir_off * cos(angle) * mult;
+
     if(dir_off >= this->curr_following_dist){
         this->last_angle = atan((-this->curr_following_x + this->x) / (this->curr_following_z - this->z));
         this->curr_angle += 20 * M_PI / 180;
         float dist = (float) rand() / (float) (RAND_MAX / (outer_radius - inner_radius)) + inner_radius;
+        // cout << "inside if : " <<  this->x << " " << this->z << endl;
         this->x = this->x - dir_off * sin(angle) * mult;
         this->z = this->z + dir_off * cos(angle) * mult;
         // cout << this->x << " " << this->z << endl;
@@ -90,6 +98,8 @@ void OpponentCar::Display(float * view, float * projection){
         // cout << "new cx and cz : " << this->curr_following_x << " " << this->curr_following_z << endl;
         this->dir_off = -0.05f;
         this->curr_following_dist = sqrt((cx - this->x) * (cx - this->x) + (cz - this->z) * (cz - this->z));
+        // cout << "inside if bye : " <<  this->x << " " << this->z << endl;
+
     }
     // dir_off +=0.10f;
     // cout << "display func : " << this->dir_off << endl;

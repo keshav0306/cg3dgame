@@ -1,5 +1,15 @@
 class Car{
     public: 
+    Car(){
+        super_init();
+    }
+    void super_init(){
+        this->health = 1000;
+        this->fuel = 100;
+        this->score = 0;
+        this->time = 0;
+        this->mileage = 0;
+    }
     float health;
     float fuel;
     float score;
@@ -14,7 +24,8 @@ class Car{
 
 class OpponentCar : public Car{
     public:
-    OpponentCar(Model * m, float * model, float x, float y, float z, float scale);
+    OpponentCar(){}
+    OpponentCar(Model * m, float * model, float x, float y, float z, float scale, int index);
     void Display(float * view, float * projection);
     vector<vector <float> > get_the_bs();
     float curr_following_x;
@@ -25,6 +36,7 @@ class OpponentCar : public Car{
     float curr_following_dist;
     float curr_angle;
     float last_angle;
+    int index;
 };
 
 class QueenCar : public Car{

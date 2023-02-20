@@ -40,6 +40,8 @@ void QueenCar::Display(float * view, float * projection){
                                 sin(this->player_angle), 0.0f, cos(this->player_angle), this->z + this->dir_off * cos(this->player_angle),
                                 0.0f, 0.0f, 0.0f, 1.0f};
 
+    this->base_x = this->x - this->dir_off * sin(this->player_angle);
+    this->base_z = this->z + this->dir_off * cos(this->player_angle);
     this->m->Display(this->model, transform, view, projection);
 
 }
