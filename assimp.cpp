@@ -26,13 +26,17 @@ using namespace std;
 int window_height;
 int window_width;
 #define NUM_CARS 5
+#define TARGET_LAPS 4
 
 float dist = 0.0f;
+float dist_travelled = 0.0f;
 float velocity = 0.0f;
 float retardation = 0.1f;
 float car_scale = 10.0;
 float inner_radius = 1400;
 float outer_radius = 2100;
+float fuel_consumed;
+int player_laps = 0;
 float ycoord = -200;
 float fuel_x;
 float fuel_y;
@@ -87,6 +91,7 @@ int collision_check(BoundingSpheres bs1, BoundingSpheres bs2, vector<vector<floa
 
 int fuel_collision(BoundingSpheres bs, vector<vector<float>> vv1){
     float r = bs.radius;
+    r += 15.0;
     for(int i=0;i<bs.n;i++){
         float v1x = vv1[i][0];
         float v1y = vv1[i][1];
@@ -110,27 +115,29 @@ void process_input(GLFWwindow * window){
         glfwSetWindowShouldClose(window, 1);
         exit(1);
     }
-    else if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
         velocity += 0.15f;
+        dist_travelled += 0.5;
         qcar.dir_off += 0.5f;
     }
-    else if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
         qcar.x -= qcar.dir_off * sin(qcar.player_angle);
         qcar.z += qcar.dir_off * cos(qcar.player_angle);
         qcar.dir_off = 0.0f;
         qcar.player_angle += 5 * M_PI / 180;
     }
-    else if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
         qcar.x -= qcar.dir_off * sin(qcar.player_angle);
         qcar.z += qcar.dir_off * cos(qcar.player_angle);
         qcar.dir_off = 0.0f;
         qcar.player_angle -= 5 * M_PI / 180;
     }
-    else if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+    if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
         velocity -= 0.1f;
+        dist_travelled += 0.5f;
         qcar.dir_off -= 0.5f;
     }
-    else if(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS){
+    if(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS){
         third_person ^= 1;
         cam_queen_dist = ((car_scale - 1) * 8) * third_person + 8;
     }
@@ -199,7 +206,7 @@ int show_dashboard(GLFWwindow * window, TextObject to){
             to.RenderText("Position " + to_string(i + 1) + " : Car " + to_string(final_positions[i]), -0.8, 0.8 - i * 0.1 - 0.2, 0.002);
         }
         to.RenderText("Position " + to_string(final_positions.size() + 1) + " : You", -0.8, 0.8 - final_positions.size() * 0.1 - 0.2, 0.002);
-        to.RenderText("Press Enter To Play Again", -0.8, -0.8, 0.002);
+        // to.RenderText("Press Enter To Respawn in the Game", -0.8, -0.8, 0.002);
         glDisable(GL_BLEND);
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -245,12 +252,12 @@ int main(){
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     Shader shader("mesh.vs", "mesh.fs");
     stadium.init("/Users/keshavgupta/desktop/CarRace/combo.obj", shader);
     car.init("/Users/keshavgupta/desktop/CarRace/mcqueen/scene.gltf", shader);
-    fuel_tank.init("/Users/keshavgupta/desktop/CarRace/another_car/scene.gltf", shader);
+    fuel_tank.init("/Users/keshavgupta/desktop/CarRace/fuel_tank/scene.gltf", shader);
     TextObject to("fonts/COMIC.TTF");
     to.attatch_shader("text_vs.vs", "text_fs.fs");
 
@@ -271,6 +278,7 @@ int main(){
     }
     int checkpnt[NUM_CARS] = {0};
     int qcar_checkpnt = 0;
+    int laps[NUM_CARS] = {0};
     qcar.init(&car, modelt, 1605.0f, ycoord, 0.0f, car_scale);
 
 game_again:
@@ -309,7 +317,7 @@ game_again:
             float rand_dist = (float) rand() / (float) (RAND_MAX / (outer_radius - inner_radius)) + inner_radius;
             float rand_angle = (float) rand() / (float) (RAND_MAX / (60 * M_PI / 180)) + 120 * M_PI / 180;
             fuel_angle += rand_angle;
-            qcar.fuel += 10;
+            qcar.fuel += 100;
             fuel_x = rand_dist * cos(fuel_angle);
             fuel_z = rand_dist * sin(fuel_angle);
         }
@@ -388,14 +396,14 @@ game_again:
 
         for(int i=0;i<opp_arr.size();i++){
             float random = (float) rand() / (float) RAND_MAX - 0.5;
-            opp_arr[i].dir_off += 2.0f + random;
+            opp_arr[i].dir_off += 15.0f + i * 0.25 + random;
         }
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        qcar.fuel -= 0.01;
-
+        qcar.fuel -= 0.02 * velocity + 0.01;
+        fuel_consumed += 0.02 * velocity + 0.01;
         // If the health or the fuel goes below 0, then break out of the loop and show the dashboard
         if(qcar.health <= 0){
             after_game = "You have No Health Left !!";
@@ -418,6 +426,13 @@ game_again:
         float slope = qcar.base_z / qcar.base_x;
         for(int i=0;i<opp_arr.size();i++){
             float slope_opp = opp_arr[i].base_z / opp_arr[i].base_x;
+            if(laps[i] > player_laps){
+                position++;
+                continue;
+            }
+            else if(laps[i] < player_laps){
+                continue;
+            }
             if(slope > 0 && slope_opp > 0){
                 if(slope < slope_opp && ( (opp_arr[i].base_x > 0 && qcar.base_x > 0) || ((opp_arr[i].base_x < 0 && qcar.base_x < 0))) ){
                     position++;
@@ -432,7 +447,7 @@ game_again:
                 }
             }
             else if(slope > 0 && slope_opp < 0){
-                if(qcar.base_x > 0 && opp_arr[i].base_x < 0){
+                if(qcar.base_x > 0 || (qcar.base_x < 0 && opp_arr[i].base_x > 0)){
                     position++;
                 }
             }
@@ -455,23 +470,34 @@ game_again:
         to.RenderText("Fuel : " + to_string(qcar.fuel), 0.6, 0.6, 0.001);
         float fuel_can_dist = sqrt((qcar.base_x - fuel_x) * (qcar.base_x - fuel_x) + (qcar.base_z - fuel_z) * (qcar.base_z - fuel_z));
         to.RenderText ("Fuel Can Distance : " + to_string(fuel_can_dist), 0.2, 0.5, 0.001);
+        to.RenderText ("Mileage : " + to_string(dist_travelled / fuel_consumed), 0.4, 0.4, 0.001);
+        to.RenderText ("Current Lap : " + to_string(player_laps), 0.6, 0.3, 0.001);
+
         glDisable(GL_BLEND);
 
         for(int i=0;i<opp_arr.size();i++){
             float slope = opp_arr[i].base_z / opp_arr[i].base_x;
-            if(checkpnt[i] && opp_arr[i].base_x > 0 && slope > 0){
+            if(checkpnt[i] && opp_arr[i].base_x > 0 && slope > 0 && laps[i] == TARGET_LAPS - 1){
                 final_positions.push_back(opp_arr[i].index);
                 opp_arr.erase(opp_arr.begin() + i);
                 i--;
+            }
+            else if(checkpnt[i] && opp_arr[i].base_x > 0 && slope > 0){
+                laps[i]++;
+                checkpnt[i] = 0;
             }
             if(slope > 0 && opp_arr[i].base_x < 0){
                 checkpnt[i] = 1;
             }
         }
 
-        if(qcar_checkpnt && slope > 0 && qcar.base_x > 0){
+        if(qcar_checkpnt && slope > 0 && qcar.base_x > 0 && player_laps == TARGET_LAPS - 1){
             after_game = "Game Over";
             break;
+        }
+        else if(qcar_checkpnt && slope > 0 && qcar.base_x > 0){
+            qcar_checkpnt = 0;
+            player_laps++;
         }
         if(slope < 0 && qcar.base_x > 0){
             qcar_checkpnt = 1;
@@ -496,7 +522,7 @@ game_again:
                         0.0f, -1.0f, 0.0f, cam_y,
                         0.0f, 0.0f, 0.0f, 1.0f};
 
-        stadium.Display(model, transform, view2, projection);
+        // stadium.Display(model, transform, view2, projection);
         qcar.Display(view2, projection);        
         for(int i=0;i<opp_arr.size();i++){
             opp_arr[i].Display(view2, projection);

@@ -30,7 +30,7 @@ OpponentCar::OpponentCar(Model * m, float * model, float inner_radius, float out
     this->y = y;
     // cout << "oppcar init : " << this->x << " " << this->y << " " << this->z << endl;
     float dist = (float) rand() / (float) (RAND_MAX / (outer_radius - inner_radius)) + inner_radius;
-    this->curr_angle = 20 * M_PI / 180;
+    this->curr_angle = 15 * M_PI / 180;
     float cx = this->curr_following_x = dist * cos(this->curr_angle);
     float cz = this->curr_following_z = dist * sin(this->curr_angle);
     this->curr_following_dist = sqrt((cx - x) * (cx - x) + (cz - z) * (cz - z));
@@ -86,7 +86,7 @@ void OpponentCar::Display(float * view, float * projection){
 
     if(dir_off >= this->curr_following_dist){
         this->last_angle = atan((-this->curr_following_x + this->x) / (this->curr_following_z - this->z));
-        this->curr_angle += 20 * M_PI / 180;
+        this->curr_angle += 15 * M_PI / 180;
         float dist = (float) rand() / (float) (RAND_MAX / (outer_radius - inner_radius)) + inner_radius;
         // cout << "inside if : " <<  this->x << " " << this->z << endl;
         this->x = this->x - dir_off * sin(angle) * mult;
